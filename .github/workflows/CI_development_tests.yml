@@ -1,0 +1,39 @@
+# ----------------------------------------------------------------------------
+# Development Tests Workflow
+# Runs fast unit tests on development branches and trunk.
+# The main branch keeps using the existing Pytest workflow before deployment.
+# ----------------------------------------------------------------------------
+
+name: Development Tests
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-24.04
+
+    steps:
+
+      # Step 1: Checkout the repository code
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      # Step 2: Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      # Step 3: Install Python dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -e ./rosemary
+
+      # Step 4: Run fast unit tests
+      - name: Run unit tests
+        run: pytest -m unit --ignore-glob='*selenium*'
