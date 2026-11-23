@@ -10,6 +10,8 @@ name: Pytest
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'diario_de_equipo.md'
   pull_request:
     branches: [main]
 
