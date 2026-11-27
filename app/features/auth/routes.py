@@ -4,11 +4,12 @@ from splent_framework.utils.form_helpers import form_error
 
 from app.features.auth import auth_bp
 from app.features.auth.forms import LoginForm, SignupForm
-from app.features.auth.services import AuthenticationService
+from app.features.auth.services import AuthenticationService, AuthRateLimitService
 from app.features.profile.services import UserProfileService
 
 authentication_service = AuthenticationService()
 user_profile_service = UserProfileService()
+rate_limit_service = AuthRateLimitService()
 
 
 @auth_bp.route("/signup/", methods=["GET", "POST"])
@@ -35,12 +36,34 @@ def login():
         return redirect(url_for("public.index"))
 
     form = LoginForm()
-    if request.method == "POST" and form.validate_on_submit():
-        if authentication_service.login(form.email.data, form.password.data):
-            return redirect(url_for("public.index"))
-        return form_error("auth/login_form.html", form, {"credentials": ["Invalid credentials"]})
+    rate_limit = {"is_blocked": False, "retry_after": 0, "attempts_left": None}
+    
+    if request.method == "POST":
+        email = (form.email.data or request.form.get("email", "")).strip()
+        ip_address = rate_limit_service.get_client_ip()
 
-    return render_template("auth/login_form.html", form=form)
+        # 1. Pre-check: block immediately with HTTP 429 if already locked out
+        current_status = rate_limit_service.check_rate_limit(email, ip_address, action="login")
+        if current_status["is_blocked"]:
+            return (
+                render_template(
+                    "auth/login_form.html",
+                    form=form,
+                    rate_limit=current_status,
+                ),
+                429,
+            )
+
+        # 2. Validate credentials if form passes WTForms validation
+        if form.validate_on_submit():
+            if authentication_service.login(email, form.password.data):
+                rate_limit_service.reset_rate_limit(email, ip_address, action="login")
+                return redirect(url_for("public.index"))
+
+            # 3. Record failure for BOTH existing and non-existent emails
+            rate_limit = rate_limit_service.record_failed_attempt(email, ip_address, action="login")
+
+    return render_template("auth/login_form.html", form=form, rate_limit=rate_limit), 200
 
 
 @auth_bp.route("/logout")
