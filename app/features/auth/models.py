@@ -53,6 +53,4 @@ class AuthRateLimit(db.Model):
     window_start = db.Column(db.DateTime, nullable=False, default=utc_now_naive)
     blocked_until = db.Column(db.DateTime, nullable=True)
 
-    __table_args__ = (
-        db.UniqueConstraint("action", "scope", "identifier", name="uq_auth_rate_limit_key"),
-    )
+    __table_args__ = (db.UniqueConstraint("action", "scope", "identifier", name="uq_auth_rate_limit_key"),)

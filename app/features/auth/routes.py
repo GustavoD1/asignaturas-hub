@@ -25,9 +25,7 @@ def show_signup_form():
         email = (form.email.data or request.form.get("email", "")).strip()
         ip_address = rate_limit_service.get_client_ip()
 
-        current_status = rate_limit_service.check_rate_limit(
-            email, ip_address, action="signup"
-        )
+        current_status = rate_limit_service.check_rate_limit(email, ip_address, action="signup")
         if current_status["is_blocked"]:
             return (
                 render_template(
@@ -41,9 +39,7 @@ def show_signup_form():
     if form.validate_on_submit():
         email = form.email.data
         if not authentication_service.is_email_available(email):
-            rate_limit = rate_limit_service.record_attempt(
-                    email, ip_address, action="signup"
-                )
+            rate_limit = rate_limit_service.record_attempt(email, ip_address, action="signup")
             form.email.errors = list(form.email.errors) + [f"{email} in use"]
             return (
                 render_template(

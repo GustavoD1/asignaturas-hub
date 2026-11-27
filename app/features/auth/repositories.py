@@ -33,14 +33,11 @@ class AuthRateLimitRepository(BaseRepository):
         super().__init__(AuthRateLimit)
 
     def get_record(self, action: str, scope: str, identifier: str) -> Optional[AuthRateLimit]:
-        return (
-            AuthRateLimit.query.filter_by(
-                action=action,
-                scope=scope,
-                identifier=identifier,
-            )
-            .first()
-        )
+        return AuthRateLimit.query.filter_by(
+            action=action,
+            scope=scope,
+            identifier=identifier,
+        ).first()
 
     def get_or_create(self, action: str, scope: str, identifier: str) -> AuthRateLimit:
         record = self.get_record(action, scope, identifier)
