@@ -1,6 +1,5 @@
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_user, logout_user
-from splent_framework.utils.form_helpers import form_error
 
 from app.features.auth import auth_bp
 from app.features.auth.forms import LoginForm, SignupForm
@@ -56,8 +55,7 @@ def show_signup_form():
             )
 
         # Tracking successful signup to rate limit signups spams
-        rate_limit_service.record_attempt(email, ip_address, action="signup") 
-        
+        rate_limit_service.record_attempt(email, ip_address, action="signup")
         user = authentication_service.create_with_profile(**form.data)
         login_user(user, remember=True)
         return redirect(url_for("public.index"))

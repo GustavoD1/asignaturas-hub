@@ -40,6 +40,7 @@ def utc_now_naive() -> datetime:
     """Return naive UTC datetime compatible with MariaDB DATETIME columns."""
     return datetime.now(timezone.utc).replace(tzinfo=None)
 
+
 # New model to store failed login attemps
 class AuthRateLimit(db.Model):
     __tablename__ = "auth_rate_limit"
