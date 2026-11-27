@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Comprueba el formato con Prettier antes de crear un commit.
+# Solo revisa los archivos preparados con git add.
+
+if ! command -v prettier >/dev/null 2>&1; then
+    echo "ERROR: Prettier no está instalado."
+    exit 1
+fi
+
+error=0
+
+while IFS= read -r -d '' archivo; do
+    case "$archivo" in
+        *.md|*.json|*.yaml|*.yml|*.js|*.jsx|*.ts|*.tsx|*.css)
+            if ! git show ":$archivo" | prettier --check --stdin-filepath "$archivo"; then
+                echo "ERROR: formato incorrecto en $archivo"
+                error=1
+            fi
+            ;;
+    esac
+done < <(git diff --cached --name-only --diff-filter=ACMR -z)
+
+exit "$error"

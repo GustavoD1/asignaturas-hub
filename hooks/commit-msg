@@ -1,0 +1,15 @@
+#!/bin/bash
+# Valida la primera linea del mensaje contra Conventional Commits.
+# git pasa como $1 la ruta del fichero temporal con el mensaje.
+
+mensaje=$(head -n 1 "$1")
+
+patron='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9_-]+\))?!?: .+'
+
+if ! [[ "$mensaje" =~ $patron ]]; then
+    echo "ERROR: el mensaje no sigue Conventional Commits."
+    echo " Has escrito: $mensaje"
+    echo " Formato:      tipo(ambito opcional): descripcion"
+    echo " Tipos:        build chore ci docs feat fix perf refactor revert style test"
+    exit 1
+fi
