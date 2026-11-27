@@ -218,7 +218,7 @@ def test_login_lockout_expires_after_window(test_client):
     time.sleep(3.1)
 
     # First wrong attempt after expiration must NOT immediately re-lock the user
-    wrong_after_expiry =test_client.post(
+    wrong_after_expiry = test_client.post(
         "/login",
         data={"email": email, "password": "WrongPassword!"},
         environ_base={"REMOTE_ADDR": client_ip},

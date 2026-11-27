@@ -70,7 +70,7 @@ def login():
 
     form = LoginForm()
     rate_limit = {"is_blocked": False, "retry_after": 0, "attempts_left": None}
-    
+
     if request.method == "POST":
         email = (form.email.data or request.form.get("email", "")).strip()
         ip_address = rate_limit_service.get_client_ip()

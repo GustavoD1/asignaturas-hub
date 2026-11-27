@@ -46,7 +46,7 @@ class AuthRateLimitRepository(BaseRepository):
         record = self.get_record(action, scope, identifier)
         if record is not None:
             return record
-        
+
         record = AuthRateLimit(
             action=action,
             scope=scope,
