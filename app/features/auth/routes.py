@@ -18,16 +18,51 @@ def show_signup_form():
         return redirect(url_for("public.index"))
 
     form = SignupForm()
+
+    # Rate limit for registered users on signup
+    rate_limit = {"is_blocked": False, "retry_after": 0, "attempts_left": None}
+
+    if request.method == "POST":
+        email = (form.email.data or request.form.get("email", "")).strip()
+        ip_address = rate_limit_service.get_client_ip()
+
+        current_status = rate_limit_service.check_rate_limit(
+            email, ip_address, action="signup"
+        )
+        if current_status["is_blocked"]:
+            return (
+                render_template(
+                    "auth/signup_form.html",
+                    form=form,
+                    rate_limit=current_status,
+                ),
+                429,
+            )
+
     if form.validate_on_submit():
         email = form.email.data
         if not authentication_service.is_email_available(email):
-            return form_error("auth/signup_form.html", form, {"email": [f"{email} in use"]})
+            rate_limit = rate_limit_service.record_attempt(
+                    email, ip_address, action="signup"
+                )
+            form.email.errors = list(form.email.errors) + [f"{email} in use"]
+            return (
+                render_template(
+                    "auth/signup_form.html",
+                    form=form,
+                    rate_limit=rate_limit,
+                ),
+                200,
+            )
 
+        # Tracking successful signup to rate limit signups spams
+        rate_limit_service.record_attempt(email, ip_address, action="signup") 
+        
         user = authentication_service.create_with_profile(**form.data)
         login_user(user, remember=True)
         return redirect(url_for("public.index"))
 
-    return render_template("auth/signup_form.html", form=form)
+    return render_template("auth/signup_form.html", form=form, rate_limit=rate_limit), 200
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
