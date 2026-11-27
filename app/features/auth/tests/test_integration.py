@@ -1,10 +1,11 @@
 """HTTP integration tests for auth via the Flask test client."""
 
-from app import db
-from app.features.auth.models import User
+import time
 
 import pytest
-import time
+
+from app import db
+from app.features.auth.models import User
 
 pytestmark = pytest.mark.integration
 

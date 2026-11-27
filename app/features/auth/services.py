@@ -8,7 +8,7 @@ from splent_framework.configuration.configuration import uploads_folder_name
 from splent_framework.services.BaseService import BaseService
 
 from app.features.auth.models import AuthRateLimit, User, utc_now_naive
-from app.features.auth.repositories import UserRepository, AuthRateLimitRepository
+from app.features.auth.repositories import AuthRateLimitRepository, UserRepository
 from app.features.profile.models import UserProfile
 from app.features.profile.repositories import UserProfileRepository
 

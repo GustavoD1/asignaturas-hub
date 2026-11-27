@@ -1,11 +1,10 @@
-from splent_framework.repositories.BaseRepository import BaseRepository
-
-from app.features.auth.models import User
-
 from typing import Optional
+
+from splent_framework.repositories.BaseRepository import BaseRepository
 from sqlalchemy.exc import IntegrityError
+
 from app import db
-from app.features.auth.models import AuthRateLimit, utc_now_naive
+from app.features.auth.models import AuthRateLimit, User, utc_now_naive
 
 
 class UserRepository(BaseRepository):
