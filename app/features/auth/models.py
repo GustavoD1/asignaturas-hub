@@ -34,3 +34,23 @@ class User(db.Model, UserMixin):
         from app.features.auth.services import AuthenticationService
 
         return AuthenticationService().temp_folder_by_user(self)
+
+
+def utc_now_naive() -> datetime:
+    """Return naive UTC datetime compatible with MariaDB DATETIME columns."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
+# New model to store failed login attemps
+class AuthRateLimit(db.Model):
+    __tablename__ = "auth_rate_limit"
+
+    id = db.Column(db.Integer, primary_key=True)
+    action = db.Column(db.String(32), nullable=False, default="login", index=True)
+    scope = db.Column(db.String(16), nullable=False)  # "email" or "ip"
+    identifier = db.Column(db.String(255), nullable=False, index=True)
+    attempts = db.Column(db.Integer, nullable=False, default=0)
+    window_start = db.Column(db.DateTime, nullable=False, default=utc_now_naive)
+    blocked_until = db.Column(db.DateTime, nullable=True)
+
+    __table_args__ = (db.UniqueConstraint("action", "scope", "identifier", name="uq_auth_rate_limit_key"),)

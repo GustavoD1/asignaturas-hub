@@ -12,12 +12,35 @@
             <form action="" method="post" novalidate>
                 {{ form.hidden_tag() }}
 
+                {% if rate_limit and rate_limit.is_blocked %}
+                <div class="row">
+                    <div class="col-md-6 col-lg-6 col-xs-12">
+                        <div id="rate-limit-alert"
+                            class="alert alert-danger"
+                            role="alert"
+                            data-retry-after="{{ rate_limit.retry_after }}">
+                            You have reached the maximum number of signup attempts.
+                            Please try again in <strong id="lockout-countdown">{{ rate_limit.retry_after }}s</strong>.
+                        </div>
+                    </div>
+                </div>
+                {% elif rate_limit and rate_limit.attempts_left is not none %}
+                <div class="row">
+                    <div class="col-md-6 col-lg-6 col-xs-12">
+                        <div id="rate-limit-attempts-alert" class="alert alert-warning" role="alert">
+                            Signup failed. You have <strong>{{ rate_limit.attempts_left }}</strong>
+                            attempt{{ 's' if rate_limit.attempts_left != 1 else '' }} left.
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
                 <div class="row">
 
                     <div class="col-md-6 col-lg-6 col-xs-12">
                         <div class="mb-3">
                             {{ form.name.label(class="form-label") }} *
-                            {{ form.name(class="form-control",placeholder="Enter name") }}
+                            {{ form.name(class="form-control",placeholder="Enter name", disabled=(rate_limit.is_blocked if rate_limit else False)) }}
                             {% for error in form.name.errors %}
                                 <span style="color: red;">{{ error }}</span>
                             {% endfor %}
@@ -27,7 +50,7 @@
                     <div class="col-md-6 col-lg-6 col-xs-12">
                         <div class="mb-3">
                             {{ form.surname.label(class="form-label") }} *
-                            {{ form.surname(class="form-control",placeholder="Enter surname") }}
+                            {{ form.surname(class="form-control",placeholder="Enter surname", disabled=(rate_limit.is_blocked if rate_limit else False)) }}
                             {% for error in form.surname.errors %}
                                 <span style="color: red;">{{ error }}</span>
                             {% endfor %}
@@ -46,7 +69,7 @@
                     <div class="col-md-6 col-lg-6 col-xs-12">
                         <div class="mb-3">
                             {{ form.email.label(class="form-label") }}
-                            {{ form.email(class="form-control",placeholder="Enter email") }}
+                            {{ form.email(class="form-control",placeholder="Enter email", disabled=(rate_limit.is_blocked if rate_limit else False)) }}
                             {% for error in form.email.errors %}
                                 <span style="color: red;">{{ error }}</span>
                             {% endfor %}
@@ -61,7 +84,7 @@
                     <div class="col-md-6 col-lg-6 col-xs-12">
                         <div class="mb-3">
                             {{ form.password.label(class="form-label") }}
-                            {{ form.password(class="form-control",placeholder="Enter password") }}
+                            {{ form.password(class="form-control",placeholder="Enter password", disabled=(rate_limit.is_blocked if rate_limit else False)) }}
                             {% for error in form.password.errors %}
                                 <span style="color: red;">{{ error }}</span>
                             {% endfor %}
@@ -73,7 +96,7 @@
                 <div class="row">
 
                     <div class="col-lg-6 col-12">
-                        {{ form.submit(class="btn btn-primary") }}
+                        {{ form.submit(class="btn btn-primary", disabled=(rate_limit.is_blocked if rate_limit else False)) }}
                     </div>
 
                 </div>
@@ -112,4 +135,5 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/auth_rate_limit.js') }}"></script>
 {% endblock %}
