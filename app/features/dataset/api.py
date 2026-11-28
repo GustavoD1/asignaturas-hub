@@ -16,6 +16,7 @@ dataset_fields = {
 
 dataset_serializer = Serializer(dataset_fields, related_serializers={"files": file_serializer})
 
+
 class DataSetResource(create_resource(DataSet, dataset_serializer)):
     """Keep the legacy API resource name while querying the UVL subtype."""
 
