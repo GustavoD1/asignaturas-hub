@@ -45,7 +45,7 @@ services:
 
   nginx:
     container_name: nginx_web_server_container
-    image: nginx:1.29.1
+    image: nginx:1.31.9
     volumes:
       - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf
       - ./nginx/html:/usr/share/nginx/html
