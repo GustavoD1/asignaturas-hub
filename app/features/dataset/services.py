@@ -36,7 +36,7 @@ def calculate_checksum_and_size(file_path):
         return hash_md5, file_size
 
 
-class DataSetService(BaseService):
+class UVLDatasetService(BaseService):
     def __init__(self):
         super().__init__(DataSetRepository())
         self.feature_model_repository = FeatureModelRepository()
@@ -255,6 +255,11 @@ class DataSetService(BaseService):
     def get_uvlhub_doi(self, dataset: DataSet) -> str:
         domain = os.getenv("DOMAIN", "localhost")
         return f"http://{domain}/doi/{dataset.ds_meta_data.dataset_doi}"
+
+
+# The current application surface is UVL-only; preserve its existing service
+# import while naming the implementation for the subtype it operates on.
+DataSetService = UVLDatasetService
 
 
 class AuthorService(BaseService):

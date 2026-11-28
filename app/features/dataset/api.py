@@ -16,7 +16,14 @@ dataset_fields = {
 
 dataset_serializer = Serializer(dataset_fields, related_serializers={"files": file_serializer})
 
-DataSetResource = create_resource(DataSet, dataset_serializer)
+class DataSetResource(create_resource(DataSet, dataset_serializer)):
+    """Keep the legacy API resource name while querying the UVL subtype."""
+
+    def __init__(self):
+        super().__init__()
+        # GenericResource derives its messages from model.__name__, which is
+        # now UVLDataset because DataSet is a compatibility alias.
+        self.model_name = "DataSet"
 
 
 def init_blueprint_api(api):

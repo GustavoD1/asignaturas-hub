@@ -24,7 +24,7 @@ class DataSetSeeder(BaseSeeder):
             raise Exception("Users not found. Please seed users first.")
 
         # Create DSMetrics instance
-        ds_metrics = DSMetrics(number_of_models="5", number_of_features="50")
+        ds_metrics = DSMetrics(number_of_models="5")
         seeded_ds_metrics = self.seed([ds_metrics])[0]
 
         # Create DSMetaData instances
@@ -61,6 +61,7 @@ class DataSetSeeder(BaseSeeder):
                 user_id=user1.id if i % 2 == 0 else user2.id,
                 ds_meta_data_id=seeded_ds_meta_data[i].id,
                 created_at=datetime.now(timezone.utc),
+                number_of_features="50",
             )
             for i in range(4)
         ]

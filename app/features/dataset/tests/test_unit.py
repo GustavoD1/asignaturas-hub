@@ -79,16 +79,12 @@ def test_get_zenodo_url_points_at_the_deposition_record():
 
 
 def test_files_and_sizes_are_aggregated_across_feature_models():
-    dataset = SimpleNamespace(
-        feature_models=[
-            SimpleNamespace(files=[SimpleNamespace(size=100), SimpleNamespace(size=200)]),
-            SimpleNamespace(files=[SimpleNamespace(size=724)]),
-        ]
-    )
+    files = [SimpleNamespace(size=100), SimpleNamespace(size=200), SimpleNamespace(size=724)]
+    dataset = SimpleNamespace(files=lambda: files)
 
     assert DataSet.get_files_count(dataset) == 3
     assert DataSet.get_file_total_size(dataset) == 1024
-    assert len(DataSet.files(dataset)) == 3
+    assert len(dataset.files()) == 3
 
 
 def test_publication_type_none_is_the_documented_default_value():
