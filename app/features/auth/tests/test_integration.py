@@ -196,7 +196,7 @@ def test_login_lockout_expires_after_window(test_client):
 
     max_attempts = 2
     test_client.application.config["AUTH_MAX_ATTEMPTS"] = max_attempts
-    test_client.application.config["AUTH_LOCKOUT_SECONDS"] = 1
+    test_client.application.config["AUTH_LOCKOUT_SECONDS"] = 2
     client_ip = "203.0.113.13"
 
     for i in range(max_attempts):
